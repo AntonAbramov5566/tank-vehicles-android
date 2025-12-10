@@ -1,4 +1,4 @@
-package ru.abramov.tank_reference_system
+package ru.abramov.tank_reference_system.ui.screen
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
