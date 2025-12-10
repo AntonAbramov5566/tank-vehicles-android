@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import ru.abramov.tank_reference_system.data.db.entity.Specifications
 import ru.abramov.tank_reference_system.data.db.entity.TankModel
 
 @Dao
@@ -22,4 +23,7 @@ interface TankDao {
 
     @Query("SELECT * FROM tank_models WHERE vehicle_class_id = :classId")
     suspend fun getByClass(classId: Int): List<TankModel>
+
+    @Query("SELECT * FROM specifications WHERE tank_model_id = :tankId")
+    suspend fun getSpecsByTankId(tankId: Int): Specifications?
 }
