@@ -54,6 +54,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import ru.abramov.tank_reference_system.R
 import ru.abramov.tank_reference_system.data.db.AppDatabase
 import ru.abramov.tank_reference_system.data.db.entity.TankModel
@@ -71,7 +75,23 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                CatalogScreen()
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "catalog") {
+                    composable("catalog") {
+                        CatalogScreen(navController = navController)
+                    }
+                    composable("login") {
+                        LoginScreen(
+                            onLogin = { user, pass ->
+                                // TODO: проверка
+                                navController.popBackStack()
+                            },
+                            onGuest = {
+                                navController.popBackStack()
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -80,14 +100,24 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogScreen(
+    navController: NavController,
     context: Context = LocalContext.current,
-    viewModel: TankViewModel = viewModel { TankViewModel(
-        TankRepository(AppDatabase.getDatabase(context))
-        )
+    viewModel: TankViewModel = viewModel {
+        TankViewModel(TankRepository(AppDatabase.getDatabase(context)))
     }
 ) {
     val tanks by viewModel.tanks.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    if (showBottomSheet) {
+        FilterBottomSheet(
+            onDismiss = { showBottomSheet = false },
+            onApply = { cls, year ->
+                // TODO: передать фильтры во ViewModel
+            }
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadTanks()
@@ -174,8 +204,8 @@ fun CatalogScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             FilterAndProfileRow(
-                onFiltersClick = { /* TODO: показать BottomSheet фильтров */ },
-                onProfileClick = { /*navController.navigate("login")*/ }
+                onFiltersClick = { showBottomSheet = true },
+                onProfileClick = { navController.navigate("login") }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
