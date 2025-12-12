@@ -48,14 +48,14 @@ object TankStorage {
             photos = listOf(
                 Photos(
                     tank_model_id = 0L,
-                    filename = "t72_front.jpg",
+                    filename = "t72_front.png",
                     description = "Общий вид",
                     photo_type = "general",
                     is_primary = true
                 ),
                 Photos(
                     tank_model_id = 0L,
-                    filename = "t72_gun.jpg",
+                    filename = "t72_gun.png",
                     description = "Пушка 2А46",
                     photo_type = "detail",
                     is_primary = false

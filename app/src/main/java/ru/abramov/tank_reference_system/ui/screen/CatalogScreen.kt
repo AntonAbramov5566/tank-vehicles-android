@@ -51,8 +51,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -60,6 +62,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.abramov.tank_reference_system.R
 import ru.abramov.tank_reference_system.data.db.AppDatabase
+import ru.abramov.tank_reference_system.data.db.entity.Photos
 import ru.abramov.tank_reference_system.data.db.entity.TankModel
 import ru.abramov.tank_reference_system.data.repository.TankRepository
 import ru.abramov.tank_reference_system.ui.theme.MyApplicationTheme
@@ -212,8 +215,9 @@ fun CatalogScreen(
 
             LazyColumn {
                 items(tanks) { tank ->
-                    TankCard(tank = tank)
-                    Spacer(modifier = Modifier.height(12.dp))
+                    val photos by viewModel.getPhotos(tank.id).collectAsStateWithLifecycle(emptyList())
+                    TankCard(tank = tank, photos = photos)
+                    Spacer(Modifier.height(12.dp))
                 }
             }
         }
@@ -222,10 +226,19 @@ fun CatalogScreen(
 
 @SuppressLint("LocalContextResourcesRead")
 @Composable
-fun TankCard(tank: TankModel) {
+fun TankCard(
+    tank: TankModel,
+    photos: List<Photos>)
+{
     val context = LocalContext.current
-    val imageName = tank.name.lowercase().replace("-", "_")
-    val resourceId = remember {
+    val primaryPhoto = photos.firstOrNull { it.is_primary }
+    val imageName = primaryPhoto?.filename
+        ?.substringBeforeLast(".")
+        ?.lowercase()
+        ?.replace("-", "_")
+        ?: "placeholder"
+
+    val resourceId = remember(imageName) {
         context.resources.getIdentifier(imageName, "drawable", context.packageName)
     }
 
@@ -240,7 +253,7 @@ fun TankCard(tank: TankModel) {
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(160.dp)
+                    .height(250.dp)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -254,7 +267,8 @@ fun TankCard(tank: TankModel) {
                     text = tank.official_name ?: tank.name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
                 )
             }
         }

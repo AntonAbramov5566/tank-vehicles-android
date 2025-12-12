@@ -5,9 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import ru.abramov.tank_reference_system.data.db.entity.Photos
 import ru.abramov.tank_reference_system.data.db.entity.TankModel
 import ru.abramov.tank_reference_system.data.repository.TankRepository
 
@@ -25,6 +27,8 @@ class TankViewModel(private val repo: TankRepository) : ViewModel() {
         }
     }
 
+    fun getPhotos(tankId: Long): Flow<List<Photos>> =
+        repo.getPhotosByTankId(tankId)
     fun searchTanks(query: String) {
         viewModelScope.launch {
             _tanks.value = if (query.isBlank()) {
