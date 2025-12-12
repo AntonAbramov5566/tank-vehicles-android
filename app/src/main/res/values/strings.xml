@@ -14,4 +14,5 @@
     <string name="enter">Войти</string>
     <string name="continue_guest">Или продолжите как гость</string>
     <string name="continue_without_logging">Продолжить без входа</string>
+    <string name="back">Назад</string>
 </resources>

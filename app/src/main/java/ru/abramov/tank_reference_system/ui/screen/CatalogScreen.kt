@@ -1,12 +1,10 @@
 package ru.abramov.tank_reference_system.ui.screen
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -22,8 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -44,27 +40,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import ru.abramov.tank_reference_system.R
 import ru.abramov.tank_reference_system.data.db.AppDatabase
-import ru.abramov.tank_reference_system.data.db.entity.Photos
-import ru.abramov.tank_reference_system.data.db.entity.TankModel
 import ru.abramov.tank_reference_system.data.repository.TankRepository
+import ru.abramov.tank_reference_system.ui.components.FilterBottomSheet
+import ru.abramov.tank_reference_system.ui.components.TankCard
 import ru.abramov.tank_reference_system.ui.theme.MyApplicationTheme
 import ru.abramov.tank_reference_system.ui.theme.MyBlack
 import ru.abramov.tank_reference_system.ui.theme.MyGreen1
@@ -93,6 +88,13 @@ class MainActivity : ComponentActivity() {
                                 navController.popBackStack()
                             }
                         )
+                    }
+                    composable(
+                        "detail/{tankId}",
+                        arguments = listOf(navArgument("tankId") { type = NavType.LongType })
+                    ) { backStackEntry ->
+                        val tankId = backStackEntry.arguments?.getLong("tankId") ?: 0L
+                        DetailScreen(tankId = tankId, navController = navController)
                     }
                 }
             }
@@ -216,65 +218,13 @@ fun CatalogScreen(
             LazyColumn {
                 items(tanks) { tank ->
                     val photos by viewModel.getPhotos(tank.id).collectAsStateWithLifecycle(emptyList())
-                    TankCard(tank = tank, photos = photos)
+                    TankCard(tank = tank, photos = photos, navController = navController)
                     Spacer(Modifier.height(12.dp))
                 }
             }
         }
     }
 }
-
-@SuppressLint("LocalContextResourcesRead")
-@Composable
-fun TankCard(
-    tank: TankModel,
-    photos: List<Photos>)
-{
-    val context = LocalContext.current
-    val primaryPhoto = photos.firstOrNull { it.is_primary }
-    val imageName = primaryPhoto?.filename
-        ?.substringBeforeLast(".")
-        ?.lowercase()
-        ?.replace("-", "_")
-        ?: "placeholder"
-
-    val resourceId = remember(imageName) {
-        context.resources.getIdentifier(imageName, "drawable", context.packageName)
-    }
-
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column {
-            Image(
-                painter = painterResource(id = if (resourceId != 0) resourceId else android.R.drawable.ic_menu_report_image),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
-                contentScale = ContentScale.Crop
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = tank.official_name ?: tank.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-}
-
 @Composable
 fun FilterAndProfileRow(
     onFiltersClick: () -> Unit,

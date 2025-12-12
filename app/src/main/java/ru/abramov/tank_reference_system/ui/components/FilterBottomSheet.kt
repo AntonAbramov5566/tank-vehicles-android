@@ -1,4 +1,4 @@
-package ru.abramov.tank_reference_system.ui.screen
+package ru.abramov.tank_reference_system.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

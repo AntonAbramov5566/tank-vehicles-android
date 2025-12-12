@@ -59,6 +59,13 @@ object TankStorage {
                     description = "Пушка 2А46",
                     photo_type = "detail",
                     is_primary = false
+                ),
+                Photos(
+                    tank_model_id = 0L,
+                    filename = "t72_plan.png",
+                    description = "Чертёж танка",
+                    photo_type = "plan",
+                    is_primary = false
                 )
             ),
             modifications = listOf(
@@ -78,8 +85,6 @@ object TankStorage {
                 )
             )
         )
-
-    /* вспомогательный data-class для удобства */
     data class TankComplete(
         val tank: TankModel,
         val specifications: Specifications,

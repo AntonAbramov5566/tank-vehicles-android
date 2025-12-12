@@ -29,8 +29,10 @@ class TankRepository(private val db: AppDatabase) {
     }
 
     suspend fun getAllTanks() = db.tankDao().getAll()
-    suspend fun getTankById(id: Int) = db.tankDao().getById(id)
-    suspend fun getSpecsByTankId(id: Int) = db.tankDao().getSpecsByTankId(id)
+    fun getTankById(id: Long) = db.tankDao().getById(id)
+    fun getSpecsByTankId(id: Long) = db.tankDao().getSpecsByTankId(id)
+    fun getHistoryByTankId(id: Long) = db.historyDao().getHistoryByTankId(id)
+    fun getModificationsByTankId(id: Long) = db.modificationsDao().getModificationsByTankId(id)
     fun getPhotosByTankId(id: Long) = db.photoDao().getByTankId(id)
 
     suspend fun getPrimaryPhoto(id: Int) = db.photoDao().getPrimaryPhoto(id)

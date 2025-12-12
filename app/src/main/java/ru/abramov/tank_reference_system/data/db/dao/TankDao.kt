@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 import ru.abramov.tank_reference_system.data.db.entity.Specifications
 import ru.abramov.tank_reference_system.data.db.entity.TankModel
 
@@ -16,7 +17,7 @@ interface TankDao {
     suspend fun getAll(): List<TankModel>
 
     @Query("SELECT * FROM tank_models WHERE id = :id")
-    suspend fun getById(id: Int): TankModel?
+    fun getById(id: Long): Flow<TankModel?>
 
     @Query("SELECT * FROM tank_models WHERE name LIKE '%' || :query || '%'")
     suspend fun searchByName(query: String): List<TankModel>
@@ -25,5 +26,5 @@ interface TankDao {
     suspend fun getByClass(classId: Int): List<TankModel>
 
     @Query("SELECT * FROM specifications WHERE tank_model_id = :tankId")
-    suspend fun getSpecsByTankId(tankId: Int): Specifications?
+    fun getSpecsByTankId(tankId: Long): Flow<Specifications?>
 }
