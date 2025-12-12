@@ -2,6 +2,7 @@ package ru.abramov.tank_reference_system.data.db.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -13,11 +14,12 @@ import androidx.room.PrimaryKey
             childColumns = ["tank_model_id"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index("tank_model_id")]
 )
 data class Specifications(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val tank_model_id: Int,
+    val tank_model_id: Long,
     val weight_kg: Int?,
     val length_m: Double?,
     val width_m: Double?,

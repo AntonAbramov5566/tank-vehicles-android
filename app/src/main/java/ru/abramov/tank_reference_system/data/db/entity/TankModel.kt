@@ -27,11 +27,11 @@ import androidx.room.PrimaryKey
     ]
 )
 data class TankModel(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val name: String,
     val official_name: String?,
-    val vehicle_class_id: Int,
-    val country_id: Int,
+    val vehicle_class_id: Long,
+    val country_id: Long,
     val development_start_year: Int?,
     val production_start_year: Int?,
     val production_end_year: Int?,

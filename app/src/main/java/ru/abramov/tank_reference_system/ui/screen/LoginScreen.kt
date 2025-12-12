@@ -1,5 +1,6 @@
 package ru.abramov.tank_reference_system.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import ru.abramov.tank_reference_system.R
 import ru.abramov.tank_reference_system.ui.theme.*
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(

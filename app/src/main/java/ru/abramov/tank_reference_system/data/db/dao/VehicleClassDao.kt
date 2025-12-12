@@ -9,7 +9,7 @@ import ru.abramov.tank_reference_system.data.db.entity.VehicleClass
 @Dao
 interface VehicleClassDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(vehicleClass: VehicleClass)
+    suspend fun insert(vehicleClass: VehicleClass): Long
 
     @Query("SELECT * FROM vehicle_classes")
     suspend fun getAll(): List<VehicleClass>

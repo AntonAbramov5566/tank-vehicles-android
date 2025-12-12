@@ -5,11 +5,16 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import ru.abramov.tank_reference_system.data.db.dao.CountryDao
+import ru.abramov.tank_reference_system.data.db.dao.HistoryDao
+import ru.abramov.tank_reference_system.data.db.dao.ModificationsDao
 import ru.abramov.tank_reference_system.data.db.dao.PhotoDao
+import ru.abramov.tank_reference_system.data.db.dao.SpecificationsDao
 import ru.abramov.tank_reference_system.data.db.dao.TankDao
 import ru.abramov.tank_reference_system.data.db.dao.UserDao
 import ru.abramov.tank_reference_system.data.db.dao.VehicleClassDao
 import ru.abramov.tank_reference_system.data.db.entity.Country
+import ru.abramov.tank_reference_system.data.db.entity.History
+import ru.abramov.tank_reference_system.data.db.entity.Modifications
 import ru.abramov.tank_reference_system.data.db.entity.Photos
 import ru.abramov.tank_reference_system.data.db.entity.Specifications
 import ru.abramov.tank_reference_system.data.db.entity.TankModel
@@ -23,9 +28,11 @@ import ru.abramov.tank_reference_system.data.db.entity.VehicleClass
         Photos::class,
         VehicleClass::class,
         Country::class,
-        User::class
+        User::class,
+        History::class,
+        Modifications::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -34,6 +41,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun vehicleClassDao(): VehicleClassDao
     abstract fun countryDao(): CountryDao
+    abstract fun specificationsDao(): SpecificationsDao
+    abstract fun historyDao(): HistoryDao
+    abstract fun modificationsDao(): ModificationsDao
 
     companion object {
         @Volatile

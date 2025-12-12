@@ -6,23 +6,23 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "photos",
+    tableName = "modifications",
     foreignKeys = [
         ForeignKey(
             entity = TankModel::class,
             parentColumns = ["id"],
-            childColumns = ["tank_model_id"],
+            childColumns = ["base_model_id"],
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("tank_model_id")]
+    indices = [Index("base_model_id")]
 )
-data class Photos(
+data class Modifications(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val tank_model_id: Long,
-    val filename: String,
-    val description: String?,
-    val photo_type: String?,
-    val is_primary: Boolean = false,
+    val base_model_id: Long,
+    val modification_name: String,
+    val description: String,
+    val production_years: String,
+    val changes: String,
     val created_at: Long = System.currentTimeMillis()
 )

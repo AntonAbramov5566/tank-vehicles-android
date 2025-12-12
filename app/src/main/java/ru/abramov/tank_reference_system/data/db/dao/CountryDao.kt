@@ -9,7 +9,7 @@ import ru.abramov.tank_reference_system.data.db.entity.Country
 @Dao
 interface CountryDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(country: Country)
+    suspend fun insert(country: Country): Long
 
     @Query("SELECT * FROM countries")
     suspend fun getAll(): List<Country>

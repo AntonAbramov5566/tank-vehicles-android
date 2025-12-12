@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "photos",
+    tableName = "history",
     foreignKeys = [
         ForeignKey(
             entity = TankModel::class,
@@ -17,12 +17,14 @@ import androidx.room.PrimaryKey
     ],
     indices = [Index("tank_model_id")]
 )
-data class Photos(
+data class History(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val tank_model_id: Long,
-    val filename: String,
-    val description: String?,
-    val photo_type: String?,
-    val is_primary: Boolean = false,
-    val created_at: Long = System.currentTimeMillis()
+    val development_history: String,
+    val production_history: String,
+    val combat_use: String,
+    val notable_features: String,
+    val interesting_facts: String,
+    val created_at: Long = System.currentTimeMillis(),
+    val updated_at: Long = System.currentTimeMillis()
 )
