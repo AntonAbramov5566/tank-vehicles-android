@@ -25,7 +25,7 @@ class TankViewModel(private val repo: TankRepository) : ViewModel() {
 
     fun loadTanks() {
         viewModelScope.launch {
-            repo.seedSingleTank()
+            repo.seedTanks()
             _tanks.value = repo.getAllTanks()
         }
     }
@@ -47,7 +47,7 @@ class TankViewModel(private val repo: TankRepository) : ViewModel() {
 
     fun loadDetails(tankId: Long) {
         viewModelScope.launch {
-            repo.seedSingleTank()
+            repo.seedTanks()
         }
     }
 }

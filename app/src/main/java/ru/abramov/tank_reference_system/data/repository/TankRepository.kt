@@ -1,6 +1,6 @@
 package ru.abramov.tank_reference_system.data.repository
 
-import kotlinx.coroutines.async
+import android.annotation.SuppressLint
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import ru.abramov.tank_reference_system.data.db.AppDatabase
@@ -9,25 +9,29 @@ import ru.abramov.tank_reference_system.data.db.entity.VehicleClass
 import ru.abramov.tank_reference_system.data.storage.TankStorage
 
 class TankRepository(private val db: AppDatabase) {
-    suspend fun seedSingleTank() = coroutineScope {
-        if (db.tankDao().getAll().isNotEmpty()) return@coroutineScope
+    @SuppressLint("SuspiciousIndentation")
+    suspend fun seedTanks(){
+        if (db.tankDao().getAll().isNotEmpty())return
 
-        val set = TankStorage.fullSet()
+        // Т-72
+        insertFullSet(TankStorage.fullSetT72())
+        // ИС-7
+        insertFullSet(TankStorage.fullSetIS7())
+    }
 
-        // 1. справочники
-        val classId = async { db.vehicleClassDao().insert(VehicleClass(name = "Основной боевой танк")) }.await()
-        val countryId = async { db.countryDao().insert(Country(name = "СССР", code = "USSR")) }.await()
+    private suspend fun insertFullSet(set: TankStorage.TankComplete) = coroutineScope {
+        val classId = db.vehicleClassDao().insert(VehicleClass(name = "Основной боевой танк"))
+        val countryId = db.countryDao().insert(Country(name = "СССР", code = "USSR"))
 
-        // 2. танк
-        val tankId = db.tankDao().insert(set.tank.copy(vehicle_class_id = classId, country_id = countryId))
+        val tankId = db.tankDao().insert(
+            set.tank.copy(vehicle_class_id = classId, country_id = countryId)
+        )
 
-        // 3. зависимые таблицы
         launch { db.specificationsDao().insert(set.specifications.copy(tank_model_id = tankId)) }
         launch { set.history.forEach { db.historyDao().insert(it.copy(tank_model_id = tankId)) } }
         launch { set.photos.forEach { db.photoDao().insert(it.copy(tank_model_id = tankId)) } }
         launch { set.modifications.forEach { db.modificationsDao().insert(it.copy(base_model_id = tankId)) } }
     }
-
     suspend fun getAllTanks() = db.tankDao().getAll()
     fun getTankById(id: Long) = db.tankDao().getById(id)
     fun getSpecsByTankId(id: Long) = db.tankDao().getSpecsByTankId(id)
