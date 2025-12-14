@@ -1,6 +1,5 @@
 package ru.abramov.tank_reference_system.ui.screen
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -66,6 +65,7 @@ import ru.abramov.tank_reference_system.ui.theme.MyGreen1
 import ru.abramov.tank_reference_system.ui.theme.MyGreen2
 import ru.abramov.tank_reference_system.ui.theme.MyLightGray
 import ru.abramov.tank_reference_system.viewmoodel.TankViewModel
+import ru.abramov.tank_reference_system.viewmoodel.TankViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,19 +74,41 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
+
+                val loginResult = remember { mutableStateOf<Pair<String, String>?>(null) }
+
+                val viewModel: TankViewModel = viewModel(
+                    factory = TankViewModelFactory(
+                        TankRepository(AppDatabase.getDatabase(LocalContext.current))
+                    )
+                )
+
+                loginResult.value?.let { (user, pass) ->
+                    LaunchedEffect(user, pass) {
+                        viewModel.login(user, pass)
+                        loginResult.value = null
+                    }
+                }
+
+                val onLogin: (String, String) -> Unit = { user, pass ->
+                    loginResult.value = user to pass
+                    navController.navigate("login") {
+                        launchSingleTop = true
+                        navController.popBackStack()
+                    }
+                }
+
                 NavHost(navController = navController, startDestination = "catalog") {
                     composable("catalog") {
-                        CatalogScreen(navController = navController)
+                        CatalogScreen(
+                            navController = navController,
+                            viewModel = viewModel
+                        )
                     }
                     composable("login") {
                         LoginScreen(
-                            onLogin = { user, pass ->
-                                // TODO: проверка
-                                navController.popBackStack()
-                            },
-                            onGuest = {
-                                navController.popBackStack()
-                            }
+                            onLogin = onLogin,
+                            navController = navController
                         )
                     }
                     composable(
@@ -94,7 +116,11 @@ class MainActivity : ComponentActivity() {
                         arguments = listOf(navArgument("tankId") { type = NavType.LongType })
                     ) { backStackEntry ->
                         val tankId = backStackEntry.arguments?.getLong("tankId") ?: 0L
-                        DetailScreen(tankId = tankId, navController = navController)
+                        DetailScreen(
+                            tankId = tankId,
+                            navController = navController,
+                            viewModel = viewModel
+                        )
                     }
                 }
             }
@@ -106,14 +132,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CatalogScreen(
     navController: NavController,
-    context: Context = LocalContext.current,
-    viewModel: TankViewModel = viewModel {
-        TankViewModel(TankRepository(AppDatabase.getDatabase(context)))
-    }
+    viewModel: TankViewModel,
 ) {
     val tanks by viewModel.tanks.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
+    val isFilterEnabled by viewModel.isFilterEnabled.collectAsStateWithLifecycle()
 
     if (showBottomSheet) {
         FilterBottomSheet(
@@ -185,6 +209,7 @@ fun CatalogScreen(
                                 .size(24.dp)
                                 .clickable {
                                     searchQuery = ""
+                                    viewModel.searchTanks(searchQuery)
                                 }
                         )
                     }
@@ -210,7 +235,8 @@ fun CatalogScreen(
 
             FilterAndProfileRow(
                 onFiltersClick = { showBottomSheet = true },
-                onProfileClick = { navController.navigate("login") }
+                onProfileClick = { navController.navigate("login") },
+                isFilterEnabled = isFilterEnabled
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -228,33 +254,36 @@ fun CatalogScreen(
 @Composable
 fun FilterAndProfileRow(
     onFiltersClick: () -> Unit,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    isFilterEnabled: Boolean
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        FilterChip(
-            selected = false,
-            modifier = Modifier.height(36.dp),
-            onClick = onFiltersClick,
-            label = { Text(stringResource(id = R.string.filter)) },
-            colors = SelectableChipColors(
-                containerColor = MyGreen2,
-                labelColor = MyBlack,
-                selectedContainerColor = MyGreen2,
-                disabledSelectedContainerColor = MyGreen2,
-                selectedLabelColor = MyBlack,
-                selectedLeadingIconColor = MyGreen2,
-                selectedTrailingIconColor = MyGreen2,
-                disabledContainerColor = MyGreen2,
-                disabledLabelColor = MyBlack,
-                disabledLeadingIconColor = MyGreen2,
-                disabledTrailingIconColor = MyGreen2,
-                leadingIconColor = MyGreen2,
-                trailingIconColor = MyGreen2
+        if (isFilterEnabled) {
+            FilterChip(
+                selected = false,
+                modifier = Modifier.height(36.dp),
+                onClick = onFiltersClick,
+                label = { Text(stringResource(id = R.string.filter)) },
+                colors = SelectableChipColors(
+                    containerColor = MyGreen2,
+                    labelColor = MyBlack,
+                    selectedContainerColor = MyGreen2,
+                    disabledSelectedContainerColor = MyGreen2,
+                    selectedLabelColor = MyBlack,
+                    selectedLeadingIconColor = MyGreen2,
+                    selectedTrailingIconColor = MyGreen2,
+                    disabledContainerColor = MyGreen2,
+                    disabledLabelColor = MyBlack,
+                    disabledLeadingIconColor = MyGreen2,
+                    disabledTrailingIconColor = MyGreen2,
+                    leadingIconColor = MyGreen2,
+                    trailingIconColor = MyGreen2
+                )
             )
-        )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 

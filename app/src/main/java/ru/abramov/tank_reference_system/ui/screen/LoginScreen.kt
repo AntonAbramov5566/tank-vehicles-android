@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import ru.abramov.tank_reference_system.R
 import ru.abramov.tank_reference_system.ui.theme.*
 
@@ -25,7 +26,7 @@ import ru.abramov.tank_reference_system.ui.theme.*
 @Composable
 fun LoginScreen(
     onLogin: (String, String) -> Unit,
-    onGuest: () -> Unit
+    navController: NavController
 ) {
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -119,7 +120,10 @@ fun LoginScreen(
             Spacer(Modifier.height(24.dp))
 
             Button(
-                onClick = { onLogin(login, password) },
+                onClick = {
+                    onLogin(login, password)
+                    navController.popBackStack()
+                },
                 enabled = canLogin,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -153,7 +157,7 @@ fun LoginScreen(
             Spacer(Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = onGuest,
+                onClick = {navController.popBackStack()},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

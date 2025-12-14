@@ -1,5 +1,6 @@
 package ru.abramov.tank_reference_system.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,13 +26,14 @@ import ru.abramov.tank_reference_system.ui.theme.*
 import ru.abramov.tank_reference_system.viewmoodel.TankViewModel
 import ru.abramov.tank_reference_system.viewmoodel.TankViewModelFactory
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     tankId: Long,
     navController: NavController,
     viewModel: TankViewModel = viewModel(
-        factory = TankViewModelFactory(        // ← твоя фабрика
+        factory = TankViewModelFactory(
             TankRepository(AppDatabase.getDatabase(LocalContext.current))
         )
     )
@@ -154,6 +156,7 @@ private fun ModificationsTab(modifications: List<Modifications>) {
     }
 }
 
+@SuppressLint("DiscouragedApi", "LocalContextResourcesRead")
 @Composable
 private fun PhotosTab(photos: List<Photos>) {
     Column(Modifier.padding(16.dp)) {

@@ -5,18 +5,26 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import ru.abramov.tank_reference_system.data.db.AppDatabase
 import ru.abramov.tank_reference_system.data.db.entity.Country
+import ru.abramov.tank_reference_system.data.db.entity.User
 import ru.abramov.tank_reference_system.data.db.entity.VehicleClass
 import ru.abramov.tank_reference_system.data.storage.TankStorage
+import ru.abramov.tank_reference_system.data.storage.UserStorage
 
 class TankRepository(private val db: AppDatabase) {
     @SuppressLint("SuspiciousIndentation")
     suspend fun seedTanks(){
         if (db.tankDao().getAll().isNotEmpty())return
 
+        seedUsers()
         // Т-72
         insertFullSet(TankStorage.fullSetT72())
         // ИС-7
         insertFullSet(TankStorage.fullSetIS7())
+    }
+
+    suspend fun seedUsers() {
+        if (db.userDao().getAll().isNotEmpty()) return
+        UserStorage.defaultUsers().forEach { db.userDao().insert(it) }
     }
 
     private suspend fun insertFullSet(set: TankStorage.TankComplete) = coroutineScope {
@@ -38,6 +46,11 @@ class TankRepository(private val db: AppDatabase) {
     fun getHistoryByTankId(id: Long) = db.historyDao().getHistoryByTankId(id)
     fun getModificationsByTankId(id: Long) = db.modificationsDao().getModificationsByTankId(id)
     fun getPhotosByTankId(id: Long) = db.photoDao().getByTankId(id)
+
+    suspend fun login(username: String, password: String): User? {
+        val hash = UserStorage.hash(password)
+        return db.userDao().authenticate(username, hash)
+    }
 
     suspend fun getPrimaryPhoto(id: Int) = db.photoDao().getPrimaryPhoto(id)
     suspend fun searchTanks(query: String) = db.tankDao().searchByName(query)
