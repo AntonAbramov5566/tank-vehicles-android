@@ -131,6 +131,14 @@ private fun HistoryTab(history: List<History>) {
     Column(Modifier.padding(16.dp)) {
         history.forEach {
             Text(it.development_history, color = MyBlack)
+            Spacer(Modifier.height(16.dp))
+            Text(it.production_history, color = MyBlack)
+            Spacer(Modifier.height(16.dp))
+            Text(it.combat_use, color = MyBlack)
+            Spacer(Modifier.height(16.dp))
+            Text(it.notable_features, color = MyBlack)
+            Spacer(Modifier.height(8.dp))
+            Text(it.interesting_facts, color = MyBlack)
             Spacer(Modifier.height(8.dp))
         }
     }
@@ -150,6 +158,7 @@ private fun ModificationsTab(modifications: List<Modifications>) {
                     Text(it.modification_name, fontWeight = FontWeight.Bold, color = MyBlack)
                     Text(it.description, color = MyBlack)
                     Text("Годы: ${it.production_years}", color = MyBlack)
+                    Text(it.changes, color = MyBlack)
                 }
             }
         }

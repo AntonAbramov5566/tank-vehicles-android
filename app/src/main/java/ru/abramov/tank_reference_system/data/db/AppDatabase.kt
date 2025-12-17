@@ -32,7 +32,7 @@ import ru.abramov.tank_reference_system.data.db.entity.VehicleClass
         History::class,
         Modifications::class
     ],
-    version = 8,
+    version = 14,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

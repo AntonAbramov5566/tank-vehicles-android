@@ -23,7 +23,25 @@ interface TankDao {
     suspend fun searchByName(query: String): List<TankModel>
 
     @Query("SELECT * FROM tank_models WHERE vehicle_class_id = :classId")
-    suspend fun getByClass(classId: Int): List<TankModel>
+    fun getByClass(classId: Long): Flow<List<TankModel>>
+
+    @Query(
+        """
+    SELECT tm.* FROM tank_models tm
+    INNER JOIN specifications s ON tm.id = s.tank_model_id
+    WHERE s.main_gun_caliber_mm = :caliber AND tm.vehicle_class_id = :classId
+    """
+    )
+    fun getByCaliberAndClass(caliber: Int, classId: Long): Flow<List<TankModel>>
+
+    @Query(
+        """
+    SELECT tm.* FROM tank_models tm
+    INNER JOIN specifications s ON tm.id = s.tank_model_id
+    WHERE s.main_gun_caliber_mm = :caliber
+    """
+    )
+    fun getByCaliber(caliber: Int): Flow<List<TankModel>>
 
     @Query("SELECT * FROM specifications WHERE tank_model_id = :tankId")
     fun getSpecsByTankId(tankId: Long): Flow<Specifications?>

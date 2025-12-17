@@ -32,7 +32,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -134,17 +133,19 @@ fun CatalogScreen(
     navController: NavController,
     viewModel: TankViewModel,
 ) {
-    val tanks by viewModel.tanks.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
     val isFilterEnabled by viewModel.isFilterEnabled.collectAsStateWithLifecycle()
+    val filteredTanks by viewModel.filteredTanks.collectAsStateWithLifecycle(emptyList())
 
     if (showBottomSheet) {
         FilterBottomSheet(
-            onDismiss = { showBottomSheet = false },
-            onApply = { cls, year ->
-                // TODO: передать фильтры во ViewModel
-            }
+            onDismiss = {   showBottomSheet = false },
+            onApply = { caliber, classId ->
+                viewModel.setFilterClass(classId)
+                viewModel.setFilterCaliber(caliber?.toInt())
+            },
+            viewModel = viewModel
         )
     }
 
@@ -174,7 +175,8 @@ fun CatalogScreen(
                 value = searchQuery,
                 onValueChange = {
                     searchQuery = it
-                    viewModel.searchTanks(it)
+                    //viewModel.searchTanks(it)
+                    viewModel.setSearchQuery(it)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -209,7 +211,8 @@ fun CatalogScreen(
                                 .size(24.dp)
                                 .clickable {
                                     searchQuery = ""
-                                    viewModel.searchTanks(searchQuery)
+                                    //viewModel.searchTanks(searchQuery)
+                                    viewModel.setSearchQuery(searchQuery)
                                 }
                         )
                     }
@@ -242,7 +245,7 @@ fun CatalogScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             LazyColumn {
-                items(tanks) { tank ->
+                items(filteredTanks) { tank ->
                     val photos by viewModel.getPhotos(tank.id).collectAsStateWithLifecycle(emptyList())
                     TankCard(tank = tank, photos = photos, navController = navController)
                     Spacer(Modifier.height(12.dp))
